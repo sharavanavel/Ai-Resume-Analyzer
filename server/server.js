@@ -61,8 +61,8 @@ app.use((err, req, res, next) => {
     res.status(500).json({ error: 'Internal server error' });
 });
 
-// ─── Connect to MongoDB & Start Server ──────────────────────
-async function startServer() {
+// ─── Connect to MongoDB ─────────────────────────────────────
+async function connectDB() {
     try {
         const mongoURI = process.env.MONGODB_URI;
 
@@ -74,16 +74,21 @@ async function startServer() {
             global.dbConnected = true;
             console.log('✅ Connected to MongoDB');
         }
-
-        app.listen(PORT, () => {
-            console.log(`\n🚀 ATS Resume Analyzer Pro`);
-            console.log(`   Server running on http://localhost:${PORT}`);
-            console.log(`   Health check: http://localhost:${PORT}/health\n`);
-        });
     } catch (error) {
-        console.error('❌ Failed to start server:', error.message);
-        process.exit(1);
+        console.error('❌ MongoDB connection failed:', error.message);
     }
 }
 
-startServer();
+connectDB();
+
+// ─── Start Server (only when run directly, not on Vercel) ───
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log(`\n🚀 ATS Resume Analyzer Pro`);
+        console.log(`   Server running on http://localhost:${PORT}`);
+        console.log(`   Health check: http://localhost:${PORT}/health\n`);
+    });
+}
+
+// Export for Vercel serverless
+module.exports = app;
