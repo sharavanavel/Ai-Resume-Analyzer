@@ -1,3 +1,10 @@
-const app = require('../server/server');
+const { app, connectDB } = require('../server/server');
 
-module.exports = app;
+// Ensure DB connects before handling requests on Vercel
+module.exports = async (req, res) => {
+    // Wait for the async connectDB from server.js to finish
+    await connectDB();
+
+    // Now delegate handling to Express
+    return app(req, res);
+};

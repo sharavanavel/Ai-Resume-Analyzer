@@ -7,9 +7,14 @@ const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 
 // Storage configuration
+const os = require('os');
+const isVercel = process.env.VERCEL === '1';
+
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, path.join(__dirname, '..', 'uploads'));
+        // Vercel only allows writing to /tmp
+        const dir = isVercel ? '/tmp' : path.join(__dirname, '..', 'uploads');
+        cb(null, dir);
     },
     filename: (req, file, cb) => {
         const ext = path.extname(file.originalname);

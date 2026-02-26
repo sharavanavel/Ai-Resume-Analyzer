@@ -62,33 +62,43 @@ app.use((err, req, res, next) => {
 });
 
 // ─── Connect to MongoDB ─────────────────────────────────────
+let cachedDb = null;
+
 async function connectDB() {
+    if (cachedDb) {
+        return cachedDb;
+    }
+
     try {
         const mongoURI = process.env.MONGODB_URI;
 
         if (!mongoURI || mongoURI.includes('YOUR_USER')) {
             console.warn('⚠️  MongoDB URI not configured. Running without database.');
             console.warn('   Set MONGODB_URI in .env file for full functionality.');
-        } else {
-            await mongoose.connect(mongoURI);
-            global.dbConnected = true;
-            console.log('✅ Connected to MongoDB');
+            return null;
         }
+
+        const conn = await mongoose.connect(mongoURI);
+        global.dbConnected = true;
+        console.log('✅ Connected to MongoDB');
+        cachedDb = conn;
+        return conn;
     } catch (error) {
         console.error('❌ MongoDB connection failed:', error.message);
+        throw error;
     }
 }
 
-connectDB();
-
 // ─── Start Server (only when run directly, not on Vercel) ───
 if (require.main === module) {
-    app.listen(PORT, () => {
-        console.log(`\n🚀 ATS Resume Analyzer Pro`);
-        console.log(`   Server running on http://localhost:${PORT}`);
-        console.log(`   Health check: http://localhost:${PORT}/health\n`);
+    connectDB().then(() => {
+        app.listen(PORT, () => {
+            console.log(`\n🚀 ATS Resume Analyzer Pro`);
+            console.log(`   Server running on http://localhost:${PORT}`);
+            console.log(`   Health check: http://localhost:${PORT}/health\n`);
+        });
     });
 }
 
-// Export for Vercel serverless
-module.exports = app;
+// Export app and connectDB for Vercel serverless
+module.exports = { app, connectDB };
