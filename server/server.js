@@ -27,6 +27,15 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
 // ─── API Routes ─────────────────────────────────────────────
+// Vercel serverless functions sometimes strip the /api prefix.
+// This middleware prepends it back so our router matches correctly.
+app.use((req, res, next) => {
+    if (process.env.VERCEL === '1' && !req.url.startsWith('/api') && req.url !== '/health') {
+        req.url = '/api' + req.url;
+    }
+    next();
+});
+
 const apiRoutes = require('./routes/api');
 app.use('/api', apiRoutes);
 
