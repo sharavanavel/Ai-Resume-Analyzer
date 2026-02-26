@@ -35,6 +35,17 @@ app.get('/health', (req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
+// ─── Serve Frontend Build (Production) ──────────────────────
+const clientBuildPath = path.join(__dirname, '..', 'client', 'dist');
+if (fs.existsSync(clientBuildPath)) {
+    app.use(express.static(clientBuildPath));
+    // All other routes → React app (for React Router)
+    app.get('*', (req, res) => {
+        res.sendFile(path.join(clientBuildPath, 'index.html'));
+    });
+    console.log('📦 Serving frontend from client/dist/');
+}
+
 // ─── Global Error Handler ───────────────────────────────────
 app.use((err, req, res, next) => {
     console.error('Unhandled Error:', err);
