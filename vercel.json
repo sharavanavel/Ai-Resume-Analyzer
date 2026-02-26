@@ -2,7 +2,7 @@
     "version": 2,
     "buildCommand": "cd client && npm install && npm run build",
     "outputDirectory": "client/dist",
-    "installCommand": "cd server && npm install && cd ../client && npm install",
+    "installCommand": "cd client && npm install",
     "framework": null,
     "rewrites": [
         {
@@ -14,7 +14,7 @@
             "destination": "/api/index.js"
         },
         {
-            "source": "/(.*)",
+            "source": "/((?!api|health).*)",
             "destination": "/index.html"
         }
     ]
