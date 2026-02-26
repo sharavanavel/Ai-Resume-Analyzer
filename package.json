@@ -2,10 +2,14 @@
     "name": "ats-resume-analyzer",
     "version": "1.0.0",
     "description": "ATS Resume Analyzer Pro - Full Stack MERN App",
+    "engines": {
+        "node": ">=18.0.0"
+    },
     "scripts": {
-        "install-all": "cd server && npm install && cd ../client && npm install",
-        "build-client": "cd client && npm run build",
-        "start": "cd server && node server.js",
-        "build": "npm run install-all && npm run build-client"
+        "install:server": "npm install --prefix server",
+        "install:client": "npm install --prefix client",
+        "build:client": "npm run build --prefix client",
+        "start": "node server/server.js",
+        "build": "npm run install:server && npm run install:client && npm run build:client"
     }
 }

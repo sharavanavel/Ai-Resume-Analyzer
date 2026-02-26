@@ -2,7 +2,7 @@
  * ATS Resume Analyzer Pro — Server Entry Point
  * Connects to MongoDB, registers routes, starts Express.
  */
-require('dotenv').config();
+require('dotenv').config({ path: require('path').join(__dirname, '.env') });
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
